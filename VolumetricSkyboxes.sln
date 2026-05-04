@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolumetricSkyboxes", "VolumetricSkyboxes/VolumetricSkyboxes.csproj", "{80412D13-1A86-4C3B-899D-1E5D6ECFDA85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolumetricSkyboxesScripts", "VolumetricSkyboxesScripts\VolumetricSkyboxesScripts.csproj", "{34FDA90F-4860-4162-92D4-514B411034D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80412D13-1A86-4C3B-899D-1E5D6ECFDA85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80412D13-1A86-4C3B-899D-1E5D6ECFDA85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80412D13-1A86-4C3B-899D-1E5D6ECFDA85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80412D13-1A86-4C3B-899D-1E5D6ECFDA85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34FDA90F-4860-4162-92D4-514B411034D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34FDA90F-4860-4162-92D4-514B411034D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34FDA90F-4860-4162-92D4-514B411034D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34FDA90F-4860-4162-92D4-514B411034D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
