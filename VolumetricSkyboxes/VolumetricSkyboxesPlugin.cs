@@ -10,8 +10,8 @@ using UnityEngine.AddressableAssets.Initialization;
 using UnityEngine.SceneManagement;
 using VolumetricSkyboxes.Assets;
 using VolumetricSkyboxes.Components;
+using VolumetricSkyboxes.Utils;
 using static VolumetricSkyboxes.Utils.PathsUtils;
-using static VolumetricSkyboxes.Utils.AssemblyUtils;
 using static System.IO.SearchOption;
 
 namespace VolumetricSkyboxes
@@ -21,7 +21,10 @@ namespace VolumetricSkyboxes
     public class VolumetricSkyboxesPlugin : BaseUnityPlugin
     {
         [AddressableAsset("Assets/VolumetricSkyboxes/Bootstrap.prefab", typeof(GameObject))]
-        private static GameObject _bootstrap;
+        internal static GameObject _bootstrap;
+
+        public static Camera PortalCamera;
+        public static bool IsCybergrind;
 
         private static readonly string CatalogDir;
         private static Harmony _harmony;
@@ -29,7 +32,6 @@ namespace VolumetricSkyboxes
 
         static VolumetricSkyboxesPlugin()
         {
-            LoadAssembly("VolumetricSkyboxesScripts.dll");
             CatalogDir = Path.Combine(AssemblyPath!, "Assets");
         }
 
@@ -48,8 +50,8 @@ namespace VolumetricSkyboxes
 
         private void Startup()
         {
-            _harmony.PatchAll();
             SceneManager.sceneLoaded += OnSceneLoaded;
+            _harmony.PatchAll();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
@@ -57,29 +59,37 @@ namespace VolumetricSkyboxes
             if (scene != SceneManager.GetActiveScene())
                 return;
 
+            IsCybergrind = SceneHelper.CurrentScene == "Endless";
+
             switch (SceneHelper.CurrentScene)
             {
                 case "Main Menu":
                 {
-                    if (_init)
-                        return;
-                    
-                    PrepareFileSystem();
-                    AssetsManager.Instance!.RegisterPrefabs(Assembly.GetExecutingAssembly());
-
-                    var skyboxesManager = VolumetricSkyboxesManager.Instance;
-                    skyboxesManager.ReloadSkyboxes();
-                    skyboxesManager.ClearCache();
-                    _init = true;
-                    
+                    Init();
                     break;
                 }
                 case "Endless":
                 {
                     Instantiate(_bootstrap);
+                    DefaultReferenceManager.Instance!.radianceEffect.GetComponentInChildren<Light>().cullingMask &=
+                        ~RenderingUtils.BackgroundLayersMask;
                     break;
                 }
             }
+        }
+
+        private static void Init()
+        {
+            if (_init)
+                return;
+            
+            PrepareFileSystem();
+            AssetsManager.Instance!.RegisterPrefabs(Assembly.GetExecutingAssembly());
+
+            var skyboxesManager = VolumetricSkyboxesManager.Instance;
+            skyboxesManager.ReloadSkyboxes();
+            skyboxesManager.ClearCache();
+            _init = true;
         }
 
         private static void PrepareFileSystem()
@@ -94,13 +104,18 @@ namespace VolumetricSkyboxes
             if  (!Directory.Exists(initialSkyboxesDir))
                 return;
             
-            foreach (var dir in Directory.GetDirectories(initialSkyboxesDir, "*", AllDirectories))
-                Directory.CreateDirectory(dir.Replace(initialSkyboxesDir, SkyboxesPath));
+            InitialSkyboxesSetup(initialSkyboxesDir);
+        }
 
-            foreach (var file in Directory.GetFiles(initialSkyboxesDir, "*.*",AllDirectories))
-                File.Copy(file, file.Replace(initialSkyboxesDir, SkyboxesPath), true);
+        private static void InitialSkyboxesSetup(string initialDir)
+        {
+            foreach (var dir in Directory.GetDirectories(initialDir, "*", AllDirectories))
+                Directory.CreateDirectory(dir.Replace(initialDir, SkyboxesPath));
+
+            foreach (var file in Directory.GetFiles(initialDir, "*.*",AllDirectories))
+                File.Copy(file, file.Replace(initialDir, SkyboxesPath), true);
             
-            Directory.Delete(initialSkyboxesDir, true);
+            Directory.Delete(initialDir, true);
         }
 
         private void SetAddressableProperties()

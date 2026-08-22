@@ -10,7 +10,7 @@
         <RootNamespace>VolumetricSkyboxes</RootNamespace>
         <AssemblyName>VolumetricSkyboxes</AssemblyName>
         <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <FileAlignment>512</FileAlignment>
         <LangVersion>9</LangVersion>
     </PropertyGroup>
@@ -52,19 +52,45 @@
       <Compile Include="Collections\SkyboxesFileTree.cs" />
       <Compile Include="Components\ArenaLightingManager.cs" />
       <Compile Include="Components\BackgroundCamera.cs" />
+      <Compile Include="Components\ExplodeUponContact.cs" />
       <Compile Include="Components\SkyboxesLowerPanel.cs" />
       <Compile Include="Components\SkyboxParallaxEffect.cs" />
+      <Compile Include="Components\SkyboxPipeline\AdjustSkyboxPositionStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\ApplyComponentsStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\AssignToBackgroundLayersStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\ISkyboxPipelineStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\RemoveUndesiredComponentsStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\PortalsSanitizeStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\SetAudioMixerStep.cs" />
+      <Compile Include="Components\SkyboxPipeline\SetLightsCullingMaskStep.cs" />
       <Compile Include="Components\VolumetricSkyboxEntry.cs" />
       <Compile Include="Components\VolumetricSkyboxesBootstrap.cs" />
       <Compile Include="Components\VolumetricSkyboxesBrowser.cs" />
+      <Compile Include="Components\VolumetricSkyboxesCredits.cs" />
       <Compile Include="Components\VolumetricSkyboxesLoader.cs" />
       <Compile Include="Components\VolumetricSkyboxesManager.cs" />
       <Compile Include="Components\VolumetricSkyboxesSettings.cs" />
       <Compile Include="Models\VolumetricSkyboxesList.cs" />
+      <Compile Include="Patches\AudioMixerControllerPatch.cs" />
+      <Compile Include="Patches\CoinPatch.cs" />
       <Compile Include="Patches\CustomFogControllerPatch.cs" />
       <Compile Include="Patches\CustomTexturesPatch.cs" />
+      <Compile Include="Patches\EndlessGridPatch.cs" />
+      <Compile Include="Patches\FinalDoorOpenerPatch.cs" />
+      <Compile Include="Patches\HookArmPatch.cs" />
+      <Compile Include="Patches\LayeringPatch.cs" />
+      <Compile Include="Patches\NailgunPatch.cs" />
+      <Compile Include="Patches\NewMovementPatch.cs" />
+      <Compile Include="Patches\PortalManagerV2Patch.cs" />
+      <Compile Include="Patches\PortalPatch.cs" />
+      <Compile Include="Patches\PortalPatchCallerContext.cs" />
+      <Compile Include="Patches\PortalPhysicsPatch.cs" />
+      <Compile Include="Patches\RandomInstantiatePatch.cs" />
+      <Compile Include="Patches\RevolverBeamPatch.cs" />
+      <Compile Include="Patches\SpaceSkyboxPatch.cs" />
+      <Compile Include="Patches\ZapperPatch.cs" />
       <Compile Include="UI\ControllerPointerToggle.cs" />
-      <Compile Include="Utils\AssemblyUtils.cs" />
+      <Compile Include="Utils\PortalUtils.cs" />
       <Compile Include="Utils\ReflectionUtils.cs" />
       <Compile Include="Utils\SkyboxFileUtility.cs" />
       <Compile Include="Utils\RenderingUtils.cs" />
@@ -74,6 +100,7 @@
       <Compile Include="Patches\PostProcessV2HandlerPatch.cs" />
       <Compile Include="PluginInfo.cs" />
       <Compile Include="Utils\PathsUtils.cs" />
+      <Compile Include="VolumetricSkyboxesTextureManager.cs" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\VolumetricSkyboxesScripts\VolumetricSkyboxesScripts.csproj" />
@@ -90,6 +117,12 @@
         </Reference>
         <Reference Include="BepInEx">
             <HintPath>$(BepInExCoreDir)BepInEx.dll</HintPath>
+        </Reference>
+        <Reference Include="plog">
+            <HintPath>$(ManagedDir)plog.dll</HintPath>
+        </Reference>
+        <Reference Include="plog.unity">
+            <HintPath>$(ManagedDir)plog.unity.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine">
             <HintPath>$(ManagedDir)UnityEngine.dll</HintPath>
@@ -136,6 +169,9 @@
         <Reference Include="UnityEngine.ResourceManager">
             <HintPath>$(ManagedDir)Unity.ResourceManager.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.Collections">
+            <HintPath>$(ManagedDir)Unity.Collections.dll</HintPath>
+        </Reference>
         <Reference Include="Newtonsoft.Json">
             <HintPath>$(ManagedDir)Newtonsoft.Json.dll</HintPath>
         </Reference>
@@ -144,6 +180,9 @@
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
             <HintPath>$(ManagedDir)UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.ParticleSystemModule">
+            <HintPath>$(ManagedDir)UnityEngine.ParticleSystemModule.dll</HintPath>
         </Reference>
         <Reference Include="Facepunch.Steamworks">
             <HintPath>$(ManagedDir)Facepunch.Steamworks.Win64.dll</HintPath>

@@ -38,6 +38,7 @@ namespace VolumetricSkyboxes.Collections
             files = RealDirectory
                 .GetFiles()
                 .Where(HasValidExtenstion)
+                .OrderByDescending(file => file.CreationTime)
                 .Select(file => SkyboxFileUtility.UnpackSkybox(file.FullName))
                 .Where(data => data != null)
                 .ToList();

@@ -9,6 +9,11 @@ namespace VolumetricSkyboxes.Components
         public Button showVolumetricSkyboxes;
         
         [SerializeField]
+        public GameObject buttonsGroup;
+        
+        [SerializeField]
         public Button settingsBtn;
+
+        public void ShowDiscordInvite() => Application.OpenURL("https://discord.gg/Mc8RhjmbMS");
     }
 }

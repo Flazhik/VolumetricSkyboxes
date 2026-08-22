@@ -13,7 +13,14 @@ namespace VolumetricSkyboxes.Components
             if (_cache.TryGetValue(guid, out var result))
                 return result;
 
-            _cache.Add(guid, VolumetricSkyboxContainer.FromGuid(guid));
+            var container = VolumetricSkyboxContainer.FromGuid(guid);
+
+            if (container == null)
+                return null;
+            
+            container.SkyboxGameObject.SetActive(false);
+
+            _cache.Add(guid, container);
             return _cache[guid];
         }
     }

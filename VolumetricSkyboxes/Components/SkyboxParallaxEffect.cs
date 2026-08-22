@@ -1,38 +1,48 @@
 ﻿using UnityEngine;
+using PortalUtils = VolumetricSkyboxes.Utils.PortalUtils;
 
 namespace VolumetricSkyboxes.Components
 {
+    [DefaultExecutionOrder(-100)]
     public class SkyboxParallaxEffect : MonoBehaviour
     {
         public float parallaxCoefficient = 1f;
-        private CameraController _cameraController;
-        private ParallaxEffect[] _parallaxEffects;
+        public Follow[] followers;
+        public MovingPlatform[] movingPlatforms;
         
+        private CameraController _cameraController;
         private Vector3 _playerPosition;
+        private Transform _transform;
 
         private void Awake()
         {
-            _playerPosition = CameraController.Instance!.transform.position;
-            _cameraController = MonoSingleton<CameraController>.Instance;
-
-            _parallaxEffects = GetComponentsInChildren<ParallaxEffect>(true);
+            _transform = transform;
+            _cameraController = CameraController.Instance!;
+            _playerPosition = _cameraController.transform.position;
+            followers = gameObject.GetComponentsInChildren<Follow>(true);
+            movingPlatforms = gameObject.GetComponentsInChildren<MovingPlatform>();
+        }
+        
+        public void FixedUpdate()
+        {
+            AdjustPosition();
+            PortalUtils.SyncPortals();
         }
 
-        private void Update()
+        public void AdjustPosition()
         {
-            var playerDelta = _cameraController.transform.position - _playerPosition;
-            transform.position += playerDelta * (1 - parallaxCoefficient);
-            
-            foreach (var child in _parallaxEffects)
-            {
-                if (child.transform == transform)
-                    continue;
+            var currentPlayerPosition = _cameraController.transform.position;
+            var playerDelta = currentPlayerPosition - _playerPosition;
 
-                var relativeCoefficient = parallaxCoefficient - child.parallaxCoefficient;
-                child.transform.localPosition += playerDelta * relativeCoefficient;
-            }
+            if (playerDelta == Vector3.zero)
+                return;
+
+            var parentFactor = 1f - parallaxCoefficient;
+            var parentTravelMatrix = Matrix4x4.Translate(playerDelta * parentFactor);
+            _transform.position = parentTravelMatrix.MultiplyPoint3x4(_transform.position);
             
-            _playerPosition = _cameraController.transform.position;
+            PortalUtils.FixComponentsPositioning(this, parentTravelMatrix);
+            _playerPosition = currentPlayerPosition;
         }
     }
 }

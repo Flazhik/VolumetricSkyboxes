@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ULTRAKILL.Portal;
 using UnityEngine;
+using PortalUtils = VolumetricSkyboxes.Utils.PortalUtils;
 
 namespace VolumetricSkyboxes.Components
 {
     [RequireComponent(typeof(Camera))]
-    public class BackgroundCamera : MonoBehaviour
+    public class BackgroundCamera : MonoBehaviour, IPortalTraveller
     {
         public Camera camera;
 
@@ -24,7 +26,9 @@ namespace VolumetricSkyboxes.Components
 
         private void Start()
         {
-            _manager = VolumetricSkyboxesManager.Instance;
+            _manager = VolumetricSkyboxesManager.Instance!;
+            PortalManagerV2.Instance!.AddPlayer(this);
+
             _manager.OnSkyboxesListChanged += UpdateFogSource;
             UpdateFogSource(_manager.Skyboxes);
         }
@@ -33,6 +37,35 @@ namespace VolumetricSkyboxes.Components
         {
             _manager.OnSkyboxesListChanged -= UpdateFogSource;
         }
+        
+        /*
+         * It's not the camera that moves on portal traversal, it's the skybox itself
+         */
+        public bool? OnTravel(PortalTravelDetails details)
+        {
+            var skybox = ULTRAKILL.Portal.PortalUtils.GetPortalObject(details.enterHandle).GetComponentInParent<SkyboxParallaxEffect>();
+            if (skybox == null)
+            {
+                Debug.LogWarning("No parent skybox found for portal");
+                return false;
+            }
+
+            var skyboxTransform = skybox.transform;
+            var position = skyboxTransform.position;
+            var inverseTravelMatrix = details.enterToExit.inverse;
+            var skyboxRotation = skyboxTransform.rotation;
+
+            skyboxTransform.rotation = Quaternion.LookRotation(
+                inverseTravelMatrix.MultiplyVector(skyboxRotation * Vector3.forward).normalized,
+                inverseTravelMatrix.MultiplyVector(skyboxRotation * Vector3.up).normalized);
+            skyboxTransform.position = inverseTravelMatrix.MultiplyPoint3x4(position);
+
+            PortalUtils.FixComponentsPositioning(skybox, inverseTravelMatrix);
+            PortalUtils.SyncPortals();
+            return true;
+        }
+
+        public void OnTeleportBlocked(PortalTravelDetails details) {}
 
         public void SetCurrentEnvironmentalFog(bool fogDisabled, Color fogColor, float fogStartDistance, float fogEndDistance)
         {
@@ -66,5 +99,13 @@ namespace VolumetricSkyboxes.Components
         {
             _fogSource = containers.LastOrDefault(t => t.Data.customFog);
         }
+
+        public int id => GetInstanceID();
+
+        public PortalTravellerType travellerType => PortalTravellerType.OTHER;
+
+        public Vector3 travellerPosition => transform.position;
+
+        public Vector3 travellerVelocity => new();
     }
 }

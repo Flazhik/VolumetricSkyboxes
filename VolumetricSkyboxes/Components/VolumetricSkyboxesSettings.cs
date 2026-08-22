@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VolumetricSkyboxes.UI;
 
 namespace VolumetricSkyboxes.Components
@@ -10,30 +11,30 @@ namespace VolumetricSkyboxes.Components
         
         [SerializeField]
         public ControllerPointerToggle overrideGridTexturesToggle;
+        
+        [SerializeField]
+        public ControllerPointerToggle muteSoundsToggle;
+        
+        [SerializeField]
+        public ControllerPointerToggle disableScorePanelToggle;
 
         private void Awake()
         {
-            overrideSkyboxesToggle.isOn =
-                PrefsManager.Instance.GetBoolLocal("cyberGrind.volumetricSkyboxes.arenaLighting.useSkyboxesPanorama",
-                    true);
+            RegisterToggle("cyberGrind.volumetricSkyboxes.arenaLighting.useSkyboxesPanorama", true,
+                overrideSkyboxesToggle, () => VolumetricSkyboxesManager.Instance.ChangePanorama());
+
+            RegisterToggle("cyberGrind.volumetricSkyboxes.useSkyboxesGridTextures", true,
+                overrideGridTexturesToggle, () => VolumetricSkyboxesManager.Instance.ChangeGridTextures());
             
-            overrideSkyboxesToggle.onValueChanged.AddListener(value =>
-            {
-                PrefsManager.Instance.SetBoolLocal("cyberGrind.volumetricSkyboxes.arenaLighting.useSkyboxesPanorama",
-                    value);
-                VolumetricSkyboxesManager.Instance.ChangePanorama();
-            });            
-            
-            overrideGridTexturesToggle.isOn =
-                PrefsManager.Instance.GetBoolLocal("cyberGrind.volumetricSkyboxes.useSkyboxesGridTextures",
-                    true);
-            
-            overrideGridTexturesToggle.onValueChanged.AddListener(value =>
-            {
-                PrefsManager.Instance.SetBoolLocal("cyberGrind.volumetricSkyboxes.useSkyboxesGridTextures",
-                    value);
-                VolumetricSkyboxesManager.Instance.ChangeGridTextures();
-            });
+            RegisterToggle("cyberGrind.volumetricSkyboxes.muteSounds", false, muteSoundsToggle);
+            RegisterToggle("cyberGrind.volumetricSkyboxes.disableScorePanel", false, disableScorePanelToggle);
+        }
+
+        private static void RegisterToggle(string key, bool fallback, ControllerPointerToggle toggle, Action postAction = null)
+        {
+            toggle.isOn = PrefsManager.Instance!.GetBoolLocal(key, fallback);
+            toggle.onValueChanged.AddListener(value => PrefsManager.Instance.SetBoolLocal(key, value));
+            postAction?.Invoke();
         }
     }
 }

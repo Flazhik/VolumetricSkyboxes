@@ -1,6 +1,7 @@
 using System.Linq;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VolumetricSkyboxes.Components;
 using static VolumetricSkyboxes.Utils.RenderingUtils;
 using static UnityEngine.Object;
@@ -17,9 +18,20 @@ namespace VolumetricSkyboxes.Patches
         [HarmonyPriority(400)]
         public static void CameraController_Start_Postfix(CameraController __instance)
         {
+            if (SceneHelper.CurrentScene != "Endless")
+            {
+                VolumetricSkyboxesPlugin.PortalCamera = Camera.main;
+                return;
+            }
+            
             if (__instance.tag is not "MainCamera")
                 return;
-            
+
+            SetupBackgroundCamera();
+        }
+
+        private static void SetupBackgroundCamera()
+        {
             var cameras = Camera.allCameras;
             var mainCam = GetCamera("Main Camera");
             var virtualCam = GetCamera("Virtual Camera");
@@ -46,9 +58,10 @@ namespace VolumetricSkyboxes.Patches
             
             mainCam.clearFlags = CameraClearFlags.Depth;
             _backgroundCam.clearFlags = CameraClearFlags.Skybox;
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
+            VolumetricSkyboxesPlugin.PortalCamera = _backgroundCam;
+            
+            SceneManager.GetActiveScene().GetRootGameObjects()
                 .Where(c => c.name == "Player").First();
-            return;
 
             Camera GetCamera(string name) => cameras.First(cam => cam.name == name);
         }

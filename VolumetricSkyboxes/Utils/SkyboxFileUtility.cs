@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using UnityEngine;
 using static VolumetricSkyboxes.Utils.PathsUtils;
 using static Newtonsoft.Json.JsonConvert;
@@ -10,6 +11,12 @@ namespace VolumetricSkyboxes.Utils
 {
     public static class SkyboxFileUtility
     {
+        public static void ReloadSkyboxes(bool forced = false)
+        {
+            foreach (var skyboxFile in Directory.GetFiles(SkyboxesPath, $"*{SkyboxExtension}", SearchOption.AllDirectories))
+                UnpackSkybox(skyboxFile, forced);
+        }
+        
         public static VolumetricSkyboxBundleData UnpackSkybox(string path, bool forced = false)
         {
             var skyboxFile = new FileInfo(path);
@@ -51,6 +58,29 @@ namespace VolumetricSkyboxes.Utils
                 Debug.LogError($"Error unpacking skybox guid=[{bundleData.guid}]");
                 Debug.LogException(e);
                 return null;
+            }
+        }
+        
+        public static void ClearCache()
+        {
+            var bundlesGuids = Directory.GetFiles(SkyboxesPath, $"*{SkyboxExtension}", SearchOption.AllDirectories)
+                .Select(skyboxFile => UnpackSkybox(skyboxFile))
+                .Where(data => !string.IsNullOrEmpty(data.guid))
+                .Select(data => data.guid)
+                .ToHashSet();
+
+            foreach (var directory in new DirectoryInfo(UnpackedSkyboxesPath).GetDirectories())
+            {
+                if (bundlesGuids.Contains(directory.Name))
+                    continue;
+                try
+                {
+                    directory.Delete(true);
+                }
+                catch (Exception)
+                {
+                    // nvm
+                }
             }
         }
 

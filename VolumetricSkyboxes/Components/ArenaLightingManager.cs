@@ -31,7 +31,6 @@ namespace VolumetricSkyboxes.Components
         private OutdoorLightMaster _olm;
         private PrefsManager _prefsManager;
         private VolumetricSkyboxesManager _manager;
-
         private VolumetricSkyboxContainer _lightingSource;
 
         private float intensityAmount;
