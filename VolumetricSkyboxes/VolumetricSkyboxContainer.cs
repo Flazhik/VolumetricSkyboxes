@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -18,7 +18,14 @@ namespace VolumetricSkyboxes
 
         public static VolumetricSkyboxContainer FromGuid(string guid)
         {
-            var skyboxPath = Path.Combine(UnpackedSkyboxesPath, guid);
+            var folderName = GetSafeName(guid);
+            if (folderName == null)
+            {
+                Debug.LogError($"Refused skybox with unsafe guid [{guid}]");
+                return null;
+            }
+
+            var skyboxPath = Path.Combine(UnpackedSkyboxesPath, folderName);
             var dataPath = Path.Combine(skyboxPath, "data.json");
             var catalogPath = Path.Combine(skyboxPath, "catalog.json");
             

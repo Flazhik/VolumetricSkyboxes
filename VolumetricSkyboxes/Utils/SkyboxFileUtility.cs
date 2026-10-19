@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -25,7 +25,14 @@ namespace VolumetricSkyboxes.Utils
             var bundleData = GetBundleData(path);
             if (bundleData?.guid == null) return null;
 
-            var dataPath = Combine(UnpackedSkyboxesPath, bundleData.guid);
+            var folderName = GetSafeName(bundleData.guid);
+            if (folderName == null)
+            {
+                Debug.LogError($"Refused skybox with unsafe guid [{bundleData.guid}] from [{path}]");
+                return null;
+            }
+
+            var dataPath = Combine(UnpackedSkyboxesPath, folderName);
             var dataFolderExists = Directory.Exists(dataPath);
 
             var previousDataExists = dataFolderExists
@@ -44,12 +51,12 @@ namespace VolumetricSkyboxes.Utils
 
             try
             {
-                if (dataFolderExists)
+                if (dataFolderExists && InsideRoot(UnpackedSkyboxesPath, dataPath) != null)
                     Directory.Delete(dataPath, true);
                 Directory.CreateDirectory(dataPath);
 
                 using var zip = new ZipArchive(File.Open(path, FileMode.Open, FileAccess.Read));
-                zip.ExtractToDirectory(dataPath);
+                ExtractArchive(zip, dataPath);
 
                 return bundleData;
             }
@@ -60,19 +67,56 @@ namespace VolumetricSkyboxes.Utils
                 return null;
             }
         }
-        
+
+        private static void ExtractArchive(ZipArchive zip, string destination)
+        {
+            foreach (var entry in zip.Entries)
+            {
+                if (string.IsNullOrEmpty(entry.Name))
+                    continue;
+
+                var target = destination;
+                var safe = true;
+
+                foreach (var name in entry.FullName
+                             .Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries)
+                             .Select(GetSafeName))
+                {
+                    if (name == null)
+                    {
+                        safe = false;
+                        break;
+                    }
+
+                    target = Combine(target, name);
+                }
+
+                if (!safe || InsideRoot(destination, target) == null)
+                {
+                    Debug.LogWarning($"Ignored unsafe archive entry [{entry.FullName}]");
+                    continue;
+                }
+
+                Directory.CreateDirectory(GetDirectoryName(target)!);
+
+                using var source = entry.Open();
+                using var file = File.Create(target);
+                source.CopyTo(file);
+            }
+        }
+
         public static void ClearCache()
         {
             var bundlesGuids = Directory.GetFiles(SkyboxesPath, $"*{SkyboxExtension}", SearchOption.AllDirectories)
-                .Select(skyboxFile => UnpackSkybox(skyboxFile))
-                .Where(data => !string.IsNullOrEmpty(data.guid))
-                .Select(data => data.guid)
+                .Select(static skyboxFile => UnpackSkybox(skyboxFile))
+                .Select(static data => GetSafeName(data?.guid))
+                .Where(static guid => guid != null)
                 .ToHashSet();
 
-            foreach (var directory in new DirectoryInfo(UnpackedSkyboxesPath).GetDirectories())
+            foreach (var directory in new DirectoryInfo(UnpackedSkyboxesPath).GetDirectories()
+                         .Where(directory => !bundlesGuids.Contains(directory.Name))
+                         .Where(static directory => InsideRoot(UnpackedSkyboxesPath, directory.FullName) != null))
             {
-                if (bundlesGuids.Contains(directory.Name))
-                    continue;
                 try
                 {
                     directory.Delete(true);

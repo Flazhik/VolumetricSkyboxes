@@ -111,9 +111,13 @@ namespace VolumetricSkyboxes.Components
             if (_spriteCache.TryGetValue(guid, out var icon))
                 return icon;
 
+            var folderName = GetSafeName(guid);
+            if (folderName == null)
+                return null;
+
             try
             {
-                var data = File.ReadAllBytes(Path.Combine(UnpackedSkyboxesPath, guid, "icon.png"));
+                var data = File.ReadAllBytes(Path.Combine(UnpackedSkyboxesPath, folderName, "icon.png"));
                 var tex = new Texture2D(0, 0, TextureFormat.RGBA32, false)
                 {
                     filterMode = FilterMode.Point

@@ -118,17 +118,8 @@
         <Reference Include="BepInEx">
             <HintPath>$(BepInExCoreDir)BepInEx.dll</HintPath>
         </Reference>
-        <Reference Include="plog">
-            <HintPath>$(ManagedDir)plog.dll</HintPath>
-        </Reference>
-        <Reference Include="plog.unity">
-            <HintPath>$(ManagedDir)plog.unity.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>$(ManagedDir)UnityEngine.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityInputSystem">
-            <HintPath>$(ManagedDir)Unity.InputSystem.dll</HintPath>
         </Reference>
         <Reference Include="UnityTextMeshPro">
             <HintPath>$(ManagedDir)Unity.TextMeshPro.dll</HintPath>
@@ -154,23 +145,11 @@
         <Reference Include="UnityEngine.UIModule">
             <HintPath>$(ManagedDir)UnityEngine.UIModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.UnityWebRequestModule">
-            <HintPath>$(ManagedDir)UnityEngine.UnityWebRequestModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UnityWebRequestAudioModule">
-            <HintPath>$(ManagedDir)UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.Addressables">
             <HintPath>$(ManagedDir)Unity.Addressables.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.AssetBundleModule">
-            <HintPath>$(ManagedDir)UnityEngine.AssetBundleModule.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.ResourceManager">
             <HintPath>$(ManagedDir)Unity.ResourceManager.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.Collections">
-            <HintPath>$(ManagedDir)Unity.Collections.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json">
             <HintPath>$(ManagedDir)Newtonsoft.Json.dll</HintPath>
@@ -180,12 +159,6 @@
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule">
             <HintPath>$(ManagedDir)UnityEngine.ImageConversionModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ParticleSystemModule">
-            <HintPath>$(ManagedDir)UnityEngine.ParticleSystemModule.dll</HintPath>
-        </Reference>
-        <Reference Include="Facepunch.Steamworks">
-            <HintPath>$(ManagedDir)Facepunch.Steamworks.Win64.dll</HintPath>
         </Reference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
